@@ -3,7 +3,7 @@ import os
 import time
 from dotenv import load_dotenv
 from helpers import time_difference
-from notion import get_feed_urls_from_notion
+from notion import get_feed_urls_from_notion, is_feed_item_exists_in_notion
 
 load_dotenv()
 
@@ -38,9 +38,15 @@ def get_new_feed_items_from(feed_url):
 
         diff = time_difference(current_time, blog_published_time)
         if diff["diffInSeconds"] < RUN_FREQUENCY:
+            title = item.get("title", "")
+            link = item.get("link", "")
+
+            if is_feed_item_exists_in_notion(title, link):
+                continue
+
             new_items.append({
-                "title": item.get("title", ""),
-                "link": item.get("link", ""),
+                "title": title,
+                "link": link,
                 "content": item.get("content", [{}])[0].get("value", item.get("summary", "")),
                 "published_parsed": pub_date
             })

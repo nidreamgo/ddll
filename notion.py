@@ -55,6 +55,30 @@ def get_feed_urls_from_notion():
     return feeds
 
 
+def is_feed_item_exists_in_notion(title, link):
+    """Check if a feed item with the given link or title already exists in Notion."""
+    url = f"{NOTION_BASE_URL}/databases/{NOTION_READER_DATABASE_ID}/query"
+
+    filters = []
+    if link:
+        filters.append({"property": "Link", "url": {"equals": link}})
+    if title:
+        filters.append({"property": "Title", "rich_text": {"equals": title}})
+
+    if not filters:
+        return False
+
+    payload = {"filter": {"or": filters}}
+
+    try:
+        response = requests.post(url, headers=_get_headers(), json=payload)
+        response.raise_for_status()
+        return len(response.json().get("results", [])) > 0
+    except requests.exceptions.RequestException as err:
+        print(f"Error checking feed item existence: {err}")
+        return False
+
+
 def add_feed_item_to_notion(notion_item):
     """Add a new feed item to the Reader database in Notion."""
     title = notion_item.get("title")
