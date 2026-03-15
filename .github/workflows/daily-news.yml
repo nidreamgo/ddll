@@ -1,0 +1,52 @@
+name: Daily News Push
+
+on:
+  schedule:
+    # 北京时间早上8点 = UTC时间0点
+    - cron: '0 0 * * *'
+    # 北京时间下午5点 = UTC时间9点
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+
+jobs:
+  push-news:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install feedparser requests beautifulsoup4
+
+      - name: Test email config
+        env:
+          MAIL_USER: ${{ secrets.MAIL_USER }}
+          MAIL_PASS: ${{ secrets.MAIL_PASS }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+        run: |
+          python -c "
+import os, smtplib
+try:
+    print('测试邮件配置...')
+    server = smtplib.SMTP_SSL('smtp.qq.com', 465)
+    server.login(os.environ['MAIL_USER'], os.environ['MAIL_PASS'])
+    print('✅ 登录成功，邮箱配置正确')
+    server.quit()
+except Exception as e:
+    print('❌ 邮箱配置错误:', e)
+    exit(1)
+          "
+
+      - name: Run news script
+        env:
+          MAIL_USER: ${{ secrets.MAIL_USER }}
+          MAIL_PASS: ${{ secrets.MAIL_PASS }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+          FEISHU_WEBHOOK: ${{ secrets.FEISHU_WEBHOOK }}
+        run: python news_bot.py
