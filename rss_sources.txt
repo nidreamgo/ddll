@@ -1,0 +1,19 @@
+# 商业科技
+36氪|https://36kr.com/feed
+虎嗅|https://www.huxiu.com/rss/
+创业邦|https://www.cyzone.cn/rss/
+
+# 创业投资
+投资界|https://rss.pedaily.cn/
+IT桔子|https://www.itjuzi.com/rss
+
+# 新闻综合
+知乎每日精选|https://www.zhihu.com/rss
+澎湃新闻|https://www.thepaper.cn/rss
+
+# 股票财经
+雪球热门|https://xueqiu.com/hq#rss
+新浪财经|https://finance.sina.com.cn/feed/
+
+# 科技资讯
+小众软件|https://www.appinn.com/feed/
