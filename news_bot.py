@@ -8,10 +8,10 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime
 from typing import List, Dict, Set
-import hashlib
+import sys
 
 # ========== 配置区域 ==========
-MAX_ARTICLES_PER_SOURCE = 10  # 每个源最多取10条
+MAX_ARTICLES_PER_SOURCE = 25  # 每个源最多取25条（已修改）
 SUMMARY_LENGTH = 150  # 摘要长度（字符数）
 
 # 读取环境变量
@@ -20,40 +20,75 @@ MAIL_PASS = os.getenv('MAIL_PASS')
 MAIL_TO = os.getenv('MAIL_TO')
 FEISHU_WEBHOOK = os.getenv('FEISHU_WEBHOOK')
 
-# ========== 读取RSS源 ==========
+# ========== 读取RSS源（必须从文件读取） ==========
 def load_rss_sources():
-    """从rss_sources.txt读取RSS源"""
+    """必须从rss_sources.txt读取RSS源，文件不存在时报错退出"""
     sources = []
+    file_path = 'rss_sources.txt'
+    
+    if not os.path.exists(file_path):
+        print(f"错误：找不到RSS源文件 {file_path}")
+        print("请创建该文件，每行格式：源名称|RSS地址")
+        print("例如：36氪|https://36kr.com/feed")
+        sys.exit(1)  # 退出程序
+    
     try:
-        with open('rss_sources.txt', 'r', encoding='utf-8') as f:
-            for line in f:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            for line_num, line in enumerate(f, 1):
                 line = line.strip()
-                if line and not line.startswith('#'):
-                    parts = line.split('|')
-                    if len(parts) == 2:
-                        sources.append({'name': parts[0], 'url': parts[1]})
-    except FileNotFoundError:
-        # 默认源
-        sources = [
-            {'name': '36氪', 'url': 'https://36kr.com/feed'},
-            {'name': '虎嗅', 'url': 'https://www.huxiu.com/rss/'},
-        ]
-    return sources
+                if not line or line.startswith('#'):
+                    continue
+                
+                parts = line.split('|')
+                if len(parts) != 2:
+                    print(f"警告：第{line_num}行格式错误，已跳过：{line}")
+                    continue
+                
+                sources.append({'name': parts[0].strip(), 'url': parts[1].strip()})
+        
+        if not sources:
+            print(f"错误：{file_path} 中没有有效的RSS源配置")
+            sys.exit(1)
+            
+        print(f"成功加载 {len(sources)} 个RSS源")
+        return sources
+        
+    except Exception as e:
+        print(f"读取RSS源文件失败: {e}")
+        sys.exit(1)
 
-# ========== 读取关键词 ==========
+# ========== 读取关键词（必须从文件读取） ==========
 def load_keywords() -> Set[str]:
-    """从keywords.txt读取关键词"""
+    """必须从keywords.txt读取关键词，文件不存在时报错退出"""
     keywords = set()
+    file_path = 'keywords.txt'
+    
+    if not os.path.exists(file_path):
+        print(f"错误：找不到关键词文件 {file_path}")
+        print("请创建该文件，每行一个关键词")
+        print("例如：融资\n商机\nIPO")
+        sys.exit(1)  # 退出程序
+    
     try:
-        with open('keywords.txt', 'r', encoding='utf-8') as f:
-            for line in f:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            for line_num, line in enumerate(f, 1):
                 line = line.strip()
-                if line and not line.startswith('#'):
-                    keywords.add(line.lower())
-    except FileNotFoundError:
-        # 默认关键词
-        keywords = {'融资', '商机', 'IPO', '创业', '股票'}
-    return keywords
+                if not line or line.startswith('#'):
+                    continue
+                
+                # 关键词统一转为小写存储（便于匹配）
+                keywords.add(line.lower())
+        
+        if not keywords:
+            print(f"错误：{file_path} 中没有有效的关键词")
+            sys.exit(1)
+            
+        print(f"成功加载 {len(keywords)} 个关键词")
+        return keywords
+        
+    except Exception as e:
+        print(f"读取关键词文件失败: {e}")
+        sys.exit(1)
 
 # ========== 抓取RSS ==========
 def fetch_rss() -> List[Dict]:
@@ -62,12 +97,25 @@ def fetch_rss() -> List[Dict]:
     keywords = load_keywords()
     all_articles = []
     
-    print(f"开始抓取 {len(sources)} 个RSS源...")
+    print(f"开始抓取 {len(sources)} 个RSS源，每个源最多取 {MAX_ARTICLES_PER_SOURCE} 条...")
     
     for source in sources:
         try:
+            print(f"正在抓取: {source['name']} ({source['url']})")
             feed = feedparser.parse(source['url'])
+            
+            # 检查feed是否解析成功
+            if hasattr(feed, 'status') and feed.status != 200:
+                print(f"警告：{source['name']} 返回状态码 {feed.status}")
+                continue
+                
+            if not feed.entries:
+                print(f"警告：{source['name']} 没有获取到任何条目")
+                continue
+            
             count = 0
+            source_articles = []
+            
             for entry in feed.entries:
                 if count >= MAX_ARTICLES_PER_SOURCE:
                     break
@@ -95,8 +143,11 @@ def fetch_rss() -> List[Dict]:
                         'source': source['name'],
                         'keywords': matched_keywords[:3]  # 只取前3个匹配的关键词
                     }
-                    all_articles.append(article)
+                    source_articles.append(article)
                     count += 1
+            
+            all_articles.extend(source_articles)
+            print(f"  └─ 从 {source['name']} 获取到 {len(source_articles)} 篇匹配文章")
                     
         except Exception as e:
             print(f"抓取 {source['name']} 失败: {e}")
@@ -230,7 +281,7 @@ def main():
     print(f"开始执行推送任务 - {datetime.now()}")
     print("="*50)
     
-    # 1. 抓取文章
+    # 1. 抓取文章（会自动检查文件是否存在）
     articles = fetch_rss()
     
     # 2. 生成消息
