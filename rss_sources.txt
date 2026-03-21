@@ -9,7 +9,7 @@
 创业邦|https://www.cyzone.cn/rss/|rss
 
 # 创业投资
-IT桔子|https://www.itjuzi.com/api/telegraph.xml|html
+IT桔子|https://www.itjuzi.com/api/telegraph.xml|rss
 投资界|https://www.pedaily.cn/all|html
 TechCrunch|https://techcrunch.com/feed/|rss
 WSJ - Tech|https://feeds.a.dj.com/rss/RSSWSJD.xml|html
