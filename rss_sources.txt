@@ -1,33 +1,33 @@
 # 商业科技
-36氪|https://36kr.com/feed
-36kr|https://36kr.com/newsflashes/
-36氪|https://36kr.com/search/articles/%E9%9B%B6%E5%94%AE
-36氪|https://36kr.com/search/articles/%E5%88%9B%E4%B8%9A
-36氪|https://36kr.com/search/articles/%E5%95%86%E6%9C%BA
-虎嗅|https://www.huxiu.com/article/
-虎嗅24h|https://www.huxiu.com/moment/
-创业邦|https://www.cyzone.cn/rss/
+36氪|https://36kr.com/feed|rss
+36kr|https://36kr.com/newsflashes/|html
+36氪|https://36kr.com/search/articles/%E9%9B%B6%E5%94%AE|html
+36氪|https://36kr.com/search/articles/%E5%88%9B%E4%B8%9A|html
+36氪|https://36kr.com/search/articles/%E5%95%86%E6%9C%BA|html
+虎嗅|https://www.huxiu.com/article/|html
+虎嗅24h|https://www.huxiu.com/moment/|html
+创业邦|https://www.cyzone.cn/rss/|rss
 
 # 创业投资
-IT桔子|https://www.itjuzi.com/api/telegraph.xml
-投资界|https://www.pedaily.cn/all/
-TechCrunch|https://techcrunch.com/feed/
-WSJ - Tech|https://feeds.a.dj.com/rss/RSSWSJD.xml
+IT桔子|https://www.itjuzi.com/api/telegraph.xml|html
+投资界|https://www.pedaily.cn/all|html
+TechCrunch|https://techcrunch.com/feed/|rss
+WSJ - Tech|https://feeds.a.dj.com/rss/RSSWSJD.xml|html
 
 # 新闻综合
-澎湃新闻|https://www.thepaper.cn/rss
+澎湃新闻|https://www.thepaper.cn/rss|rss
 
 # 股票财经
-雪球热门|https://xueqiu.com/hq#rss
+雪球热门|https://xueqiu.com/hq#rss|rss
 
 # AI
-radarai|https://radarai.top/
-VentureBeat - AI|https://venturebeat.com/category/ai/feed
-TechCrunch - AI|https://techcrunch.com/category/artificial-intelligence/feed/
+radarai|https://radarai.top/|html
+VentureBeat - AI|https://venturebeat.com/category/ai/feed|rss
+TechCrunch - AI|https://techcrunch.com/category/artificial-intelligence/feed/|rss
 
 # 科技资讯
-小众软件|https://www.appinn.com/feed/
+小众软件|https://www.appinn.com/feed/|rss
 
 # 消费与营销
-亿邦动力|http://www.ebrun.com/rss/
-Morketing|https://www.morketing.com/newsflash
+亿邦动力|http://www.ebrun.com/rss/|rss
+Morketing|https://www.morketing.com/newsflash|html
