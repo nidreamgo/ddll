@@ -2,11 +2,9 @@ name: Daily News Push
 
 on:
   schedule:
-    # 北京时间早上8点 = UTC时间0点
-    - cron: '0 0 * * *'
-    # 北京时间下午5点 = UTC时间9点
-    - cron: '0 9 * * *'
-  workflow_dispatch:  # 允许手动触发
+    - cron: '0 0 * * *'   # 北京时间 08:00
+    - cron: '0 9 * * *'   # 北京时间 17:00
+  workflow_dispatch:
 
 jobs:
   push-news:
@@ -14,17 +12,26 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-      
+
+      - name: Cache pushed URLs
+        uses: actions/cache@v3
+        id: cache-pushed
+        with:
+          path: pushed_urls.txt
+          key: ${{ runner.os }}-pushed-urls
+          restore-keys: |
+            ${{ runner.os }}-pushed-urls
+
       - name: Install dependencies
         run: |
-          pip install feedparser requests beautifulsoup4
-      
-      - name: Run news script
+          pip install feedparser requests beautifulsoup4 pytz
+
+      - name: Run news bot
         env:
           MAIL_USER: ${{ secrets.MAIL_USER }}
           MAIL_PASS: ${{ secrets.MAIL_PASS }}
