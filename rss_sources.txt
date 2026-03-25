@@ -7,6 +7,7 @@
 虎嗅|https://www.huxiu.com/article/|html
 虎嗅24h|https://www.huxiu.com/moment/|html
 创业邦|https://www.cyzone.cn/rss/|rss
+分享创造日报|https://v2ex-create.nexmm.com/rss.xml|rss
 
 # 创业投资
 IT桔子|https://www.itjuzi.com/api/telegraph.xml|rss
